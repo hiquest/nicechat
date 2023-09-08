@@ -1,0 +1,22 @@
+{
+  "name": "q",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.4.1",
+    "@types/turndown": "^5.0.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "chalk": "^4",
+    "openai": "^4.5.0",
+    "turndown": "^7.1.2"
+  }
+}
