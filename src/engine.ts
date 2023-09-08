@@ -24,18 +24,34 @@ const engine = {
   async run() {
     const settings = await readSettings();
     const args = process.argv.slice(2);
-    const openai = new OpenAI({ apiKey: settings.openai_key });
 
-    const logLevel = args.some((x) => x === "--debug") ? "DEBUG" : "INFO";
+    const command = args[0] ?? "chat";
+
+    const openai = new OpenAI({ apiKey: settings.openai_key });
+    const isDebug = args.some((x) => x === "--debug");
 
     const functions = Object.values(engine.plugins).map((x) => x.meta);
 
-    if (args.some((x) => x === "--list-models")) {
+    if (command === "list-models") {
       await listModels();
-    } else {
+    } else if (command === "chat") {
       await chat();
+    } else if (command === "help") {
+      printHelp();
+    } else {
+      console.log("Unknown command: " + command);
     }
     process.exit(0);
+
+    function printHelp() {
+      console.log("Available commands:");
+      const c = chalk.bold;
+      console.log(
+        `  ${c("chat [--debug]")}   start chat with the assistant (default)`
+      );
+      console.log(`  ${c("list-models")}      list available models`);
+      console.log(`  ${c("help")}             show this help`);
+    }
 
     async function listModels() {
       let models = null;
@@ -105,8 +121,7 @@ const engine = {
 
           const toolkit = {
             log: logger(`[${plugin.meta.name}]`),
-            debug:
-              logLevel === "DEBUG" ? logger(`[${plugin.meta.name}]`) : () => {},
+            debug: isDebug ? logger(`[${plugin.meta.name}]`) : () => {},
           };
 
           const fnResult = await plugin.execute(fcall.arguments, { toolkit });
