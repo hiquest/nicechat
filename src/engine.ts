@@ -106,13 +106,11 @@ const engine = {
           const toolkit = {
             log: logger(`[${plugin.meta.name}]`),
             debug:
-              logLevel === "DEBUG"
-                ? logger(`[${plugin.meta.name}]`)
-                : () => {},
+              logLevel === "DEBUG" ? logger(`[${plugin.meta.name}]`) : () => {},
           };
 
           const fnResult = await plugin.execute(fcall.arguments, { toolkit });
-          console.log()
+          console.log();
           history.push(fnResultResp(fcall.name, fnResult));
         } else {
           history.push(assistant(msg));
@@ -134,7 +132,7 @@ async function readSettings() {
   if (!fs.existsSync(absPath)) {
     console.log(
       `File ${chalk.bold(
-        "aichat.json"
+        `~/${SETTINGS_FILE_NAME}`
       )} not found. Do you want to create it? ${chalk.yellowBright("[y]/n")}`
     );
     // TODO: read user input
