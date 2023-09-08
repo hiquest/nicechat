@@ -1,5 +1,6 @@
 # nicechat
-Extensible command-line chat for OpenAI's models.
+
+An extensible command-line chat for OpenAI's models.
 
 ## How to use it?
 
@@ -13,7 +14,7 @@ Create a configuration file at `~/.nicechat.json`.
 }
 ```
 
-Run chat With
+Start the chat:
 
 ```
 $ nicechat
@@ -23,6 +24,6 @@ $ nicechat
 
 There are just three options for now:
 
-- `openai_key` - your OpenAI key required to communicate with OpenAI Apis. [Find it here](https://platform.openai.com/account/api-keys).
-- `model` - one of the GPT models. Don't forget to control your spendings
+- `openai_key` - your OpenAI key required to communicate with OpenAI Apis. [Find it here](https://platform.openai.com/account/api-keys). Don't forget to control your spendings.
+- `model` - one of the GPT models. You can list available models with `nicechat --list-models`.
 - `system` - sets up the initial role of your assistant.

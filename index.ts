@@ -1,12 +1,14 @@
+#!/usr/bin/env node
+
 import engine from "./src/engine";
 import FetchWebsite from "./src/plugins/FetchWebsite";
 
 async function main() {
   // register plugins
-  engine.registerPlugin(FetchWebsite)
+  engine.registerPlugin(FetchWebsite);
 
   // run the cli
-  await engine.run()
+  await engine.run();
 }
 
 main();

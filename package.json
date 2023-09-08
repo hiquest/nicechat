@@ -1,7 +1,10 @@
 {
   "name": "nicechat",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "An extensible AI chat framework for OpenAi's models",
+  "bin": {
+    "nicechat": "dist/index.js"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
