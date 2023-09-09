@@ -1,18 +1,10 @@
 import chalk from "chalk";
-import fs from "fs";
 import * as readline from "node:readline/promises";
 import OpenAI from "openai";
-import path from "path";
+import { readSettings } from "./helpers/settings";
 import { ChatPlugin } from "./plugins/ChatPlugin";
 
-const SETTINGS_FILE_NAME = ".nicechat.json";
 const EXIT_COMMANDS = ["exit", "quit", "q", "bye"];
-
-type Settings = {
-  model: string;
-  openai_key: string;
-  system: string;
-};
 
 const NiceChat = {
   plugins: {} as Record<string, ChatPlugin>,
@@ -145,31 +137,15 @@ const NiceChat = {
   },
 };
 
-async function readSettings() {
-  // settings file should be in the HOME directory
-  const absPath = path.join(process.env.HOME ?? "", SETTINGS_FILE_NAME);
-
-  if (!fs.existsSync(absPath)) {
-    console.log(
-      `File ${chalk.bold(
-        `~/${SETTINGS_FILE_NAME}`
-      )} not found. Do you want to create it? ${chalk.yellowBright("[y]/n")}`
-    );
-    // TODO: read user input
-    process.exit(0);
-  }
-
-  const settings = JSON.parse(fs.readFileSync(absPath, "utf-8")) as Settings;
-  return settings;
-}
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
 async function readLine() {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
   const textUntrimmed = await rl.question(chalk.yellow("> "));
+  rl.close();
+
   const text = textUntrimmed.trim();
 
   if (EXIT_COMMANDS.includes(text)) {
