@@ -1,6 +1,6 @@
 {
   "name": "nicechat",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "An extensible AI chat framework for OpenAi's models",
   "bin": {
     "nicechat": "dist/index.js"
@@ -11,8 +11,18 @@
     "build": "tsc",
     "dev": "tsc && node dist/index.js"
   },
-  "files": ["dist", "LICENSE", "README.md", "package.json"],
-  "keywords": ["chat", "CLI", "command-line", "AI"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "keywords": [
+    "chat",
+    "CLI",
+    "command-line",
+    "AI"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {

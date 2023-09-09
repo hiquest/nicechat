@@ -1,14 +1,18 @@
 #!/usr/bin/env node
 
-import engine from "./src/engine";
+import NiceChat from "./src/nicechat";
+import CurrentTime from "./src/plugins/CurrentTime";
 import FetchWebsite from "./src/plugins/FetchWebsite";
+import UrlOpener from "./src/plugins/UrlOpener";
 
 async function main() {
   // register plugins
-  engine.registerPlugin(FetchWebsite);
+  NiceChat.registerPlugin(FetchWebsite);
+  NiceChat.registerPlugin(CurrentTime);
+  NiceChat.registerPlugin(UrlOpener);
 
   // run the cli
-  await engine.run();
+  await NiceChat.run();
 }
 
 main();

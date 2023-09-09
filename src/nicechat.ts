@@ -14,11 +14,11 @@ type Settings = {
   system: string;
 };
 
-const engine = {
+const NiceChat = {
   plugins: {} as Record<string, ChatPlugin>,
 
   registerPlugin(p: ChatPlugin) {
-    engine.plugins[p.meta.name] = p;
+    NiceChat.plugins[p.meta.name] = p;
   },
 
   async run() {
@@ -30,7 +30,7 @@ const engine = {
     const openai = new OpenAI({ apiKey: settings.openai_key });
     const isDebug = args.some((x) => x === "--debug");
 
-    const functions = Object.values(engine.plugins).map((x) => x.meta);
+    const functions = Object.values(NiceChat.plugins).map((x) => x.meta);
 
     if (command === "list-models") {
       await listModels();
@@ -114,7 +114,7 @@ const engine = {
           // function call
           history.push(assistantFn(fcall));
 
-          const plugin = engine.plugins[fcall.name];
+          const plugin = NiceChat.plugins[fcall.name];
           if (!plugin) {
             throw new Error("Unregistered function: " + fcall.name);
           }
@@ -124,6 +124,11 @@ const engine = {
             debug: isDebug ? logger(`[${plugin.meta.name}]`) : () => {},
           };
 
+          console.log(
+            `[${chalk.blueBright(plugin.meta.name)}]: ${chalk.yellowBright(
+              fcall.arguments.replace(/\n/g, " ").replace(/\s+/g, " ")
+            )}`
+          );
           const fnResult = await plugin.execute(fcall.arguments, { toolkit });
           console.log();
           history.push(fnResultResp(fcall.name, fnResult));
@@ -206,7 +211,7 @@ function fnResultResp(
   return { role: "function", name, content };
 }
 
-export default engine;
+export default NiceChat;
 
 function logger(prefix: string) {
   return function log(msg: string) {

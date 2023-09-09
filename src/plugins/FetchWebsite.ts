@@ -1,4 +1,4 @@
-import {ChatPlugin} from "./ChatPlugin";
+import { ChatPlugin } from "./ChatPlugin";
 import TurndownService from "turndown";
 
 const FetchWebsite: ChatPlugin = {
@@ -17,7 +17,7 @@ const FetchWebsite: ChatPlugin = {
   },
   execute: async (args: string, { toolkit }) => {
     const url = JSON.parse(args)["url"];
-    toolkit.log(`Fetching: ${url}`);
+    toolkit.debug(`Fetching: ${url}`);
     const html = await fetch(url).then((x) => x.text());
     return htmlToMd(html);
   },
@@ -36,7 +36,10 @@ function htmlToMd(html: string) {
 
   // stretegy 1: if there is only one article tag, then we can just use that
   if (hasArticleTag && !hasMultipleArticleTags) {
-    const article = "<article" + html.split("<article")[1].split("</article>")[0] + "</article>";
+    const article =
+      "<article" +
+      html.split("<article")[1].split("</article>")[0] +
+      "</article>";
     const res = processHtml(article);
     // console.log("res", res);
     return res;
@@ -53,7 +56,8 @@ function htmlToMd(html: string) {
   }
 
   // stretegy 3: if there is a body tag, then we can just use that
-  const bodyContent = '<body' +  html.split("<body")[1].split("</body>")[0] + "</body>";
+  const bodyContent =
+    "<body" + html.split("<body")[1].split("</body>")[0] + "</body>";
   const res = processHtml(bodyContent);
   // console.log("res", res);
   return res;
