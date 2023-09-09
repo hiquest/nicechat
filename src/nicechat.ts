@@ -17,7 +17,7 @@ const NiceChat = {
     const settings = await readSettings();
     const args = process.argv.slice(2);
 
-    const command = args[0] ?? "chat";
+    const command = !args[0] || args[0].startsWith("--") ? "chat" : args[0];
 
     const openai = new OpenAI({ apiKey: settings.openai_key });
     const isDebug = args.some((x) => x === "--debug");
@@ -28,6 +28,18 @@ const NiceChat = {
       await listModels();
     } else if (command === "chat") {
       await chat();
+    } else if (command === "run-plugin") {
+      const pluginName = args[1];
+      const plugin = NiceChat.plugins[pluginName];
+      if (!plugin) {
+        throw new Error("Unregistered plugin: " + pluginName);
+      }
+      const toolkit = {
+        log: logger(`[${plugin.meta.name}]`),
+        debug: logger(`[${plugin.meta.name}]`),
+      };
+      const result = await plugin.execute(args[2], { toolkit });
+      console.log(result);
     } else if (command === "help") {
       printHelp();
     } else {

@@ -19,18 +19,22 @@ const FetchWebsite: ChatPlugin = {
     const url = JSON.parse(args)["url"];
     toolkit.debug(`Fetching: ${url}`);
     const html = await fetch(url).then((x) => x.text());
-    return htmlToMd(html);
+    // toolkit.debug(`Raw html: ${html}`);
+
+    const res = htmlToMd(html, toolkit.debug);
+    toolkit.debug(`Result: ${res}`);
+    return res;
   },
 };
 
 export default FetchWebsite;
 
-function htmlToMd(html: string) {
+function htmlToMd(html: string, d: (s: string) => void) {
   const hasMainTag = html.includes("<main");
-  // console.log("hasMainTag", hasMainTag);
+  d("hasMainTag: " + hasMainTag);
 
   const hasArticleTag = html.includes("<article");
-  // console.log("hasArticleTag", hasMainTag);
+  d("hasArticleTag: " + hasArticleTag);
 
   const hasMultipleArticleTags = html.split("<article").length > 2;
 
@@ -40,7 +44,7 @@ function htmlToMd(html: string) {
       "<article" +
       html.split("<article")[1].split("</article>")[0] +
       "</article>";
-    const res = processHtml(article);
+    const res = processHtml(removeStyleAndScript(article));
     // console.log("res", res);
     return res;
   }
@@ -50,7 +54,7 @@ function htmlToMd(html: string) {
     const mainContent =
       "<main" + html.split("<main")[1].split("</main>")[0] + "</main>";
 
-    const res = processHtml(mainContent);
+    const res = processHtml(removeStyleAndScript(mainContent));
     // console.log("res", res);
     return res;
   }
@@ -58,9 +62,22 @@ function htmlToMd(html: string) {
   // stretegy 3: if there is a body tag, then we can just use that
   const bodyContent =
     "<body" + html.split("<body")[1].split("</body>")[0] + "</body>";
-  const res = processHtml(bodyContent);
+
+  d("bodyContent: " + bodyContent);
+
+  const res = processHtml(removeStyleAndScript(bodyContent));
   // console.log("res", res);
   return res;
+}
+
+function removeStyleAndScript(html: string) {
+  // Remove style tags and their contents
+  let cleanedHtml = html.replace(/<style[\s\S]*?<\/style>/gi, "");
+
+  // Remove script tags and their contents
+  cleanedHtml = cleanedHtml.replace(/<script[\s\S]*?<\/script>/gi, "");
+
+  return cleanedHtml;
 }
 
 function processHtml(html: string) {
