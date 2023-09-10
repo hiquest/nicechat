@@ -2,6 +2,8 @@
 
 An extensible command-line chat for OpenAI's models.
 
+![Demo GIF](./media/intro.gif)
+
 ## How to use it?
 
 Create a configuration file at `~/.nicechat.json`.
