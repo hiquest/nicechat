@@ -36,6 +36,8 @@ Nicechat comes with several useful plugins that are basically just [functions](h
 
 ### WebsiteFetcher
 
+![WebsiteFetcher](./media/fetch_website.gif)
+
 WebsiteFetcher fetches contents of some website (only textual content). It can be used with GPT's ability to summarize content.
 
 ### UrlOpener
