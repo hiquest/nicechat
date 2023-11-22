@@ -7,10 +7,10 @@ import { ChatPlugin } from "./plugins/ChatPlugin";
 const EXIT_COMMANDS = ["exit", "quit", "q", "bye"];
 
 const NiceChat = {
-  plugins: {} as Record<string, ChatPlugin>,
+  plugins: new Map<string, ChatPlugin>(),
 
   registerPlugin(p: ChatPlugin) {
-    NiceChat.plugins[p.meta.name] = p;
+    NiceChat.plugins.set(p.meta.name, p);
   },
 
   async run() {
@@ -22,7 +22,7 @@ const NiceChat = {
     const openai = new OpenAI({ apiKey: settings.openai_key });
     const isDebug = args.some((x) => x === "--debug");
 
-    const functions = Object.values(NiceChat.plugins).map((x) => x.meta);
+    const functions = [...NiceChat.plugins.values()].map((x) => x.meta);
 
     if (command === "list-models") {
       await listModels();
@@ -30,7 +30,7 @@ const NiceChat = {
       await chat();
     } else if (command === "run-plugin") {
       const pluginName = args[1];
-      const plugin = NiceChat.plugins[pluginName];
+      const plugin = NiceChat.plugins.get(pluginName);
       if (!plugin) {
         throw new Error("Unregistered plugin: " + pluginName);
       }
@@ -50,9 +50,11 @@ const NiceChat = {
     function printHelp() {
       console.log("Available commands:");
       const c = chalk.bold;
+      console.log("");
       console.log(
         `  ${c("chat [--debug]")}   start chat with the assistant (default)`
       );
+      console.log("");
       console.log(`  ${c("list-models")}      list available models`);
       console.log(`  ${c("help")}             show this help`);
     }
@@ -70,19 +72,19 @@ const NiceChat = {
     async function chat() {
       console.log("[" + chalk.blueBright(settings.system) + "]");
 
-      const history: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
         system(settings.system),
       ];
 
       // initial use input
       const input = await readLine();
-      history.push(user(input));
+      messages.push(user(input));
 
       while (true) {
         // starting stream
         const stream = await openai.chat.completions.create({
           model: settings.model,
-          messages: history,
+          messages,
           functions,
           stream: true,
         });
@@ -116,9 +118,9 @@ const NiceChat = {
 
         if (fcall.name) {
           // function call
-          history.push(assistantFn(fcall));
+          messages.push(assistantFn(fcall));
 
-          const plugin = NiceChat.plugins[fcall.name];
+          const plugin = NiceChat.plugins.get(fcall.name);
           if (!plugin) {
             throw new Error("Unregistered function: " + fcall.name);
           }
@@ -135,14 +137,14 @@ const NiceChat = {
           );
           const fnResult = await plugin.execute(fcall.arguments, { toolkit });
           console.log();
-          history.push(fnResultResp(fcall.name, fnResult));
+          messages.push(fnResultResp(fcall.name, fnResult));
         } else {
-          history.push(assistant(msg));
+          messages.push(assistant(msg));
 
           // ask user for next input
           console.log("\n");
           const input = await readLine();
-          history.push(user(input));
+          messages.push(user(input));
         }
       }
     }
@@ -170,25 +172,25 @@ async function readLine() {
 
 function system(
   content: string
-): OpenAI.Chat.Completions.ChatCompletionMessageParam {
+): OpenAI.Chat.Completions.ChatCompletionSystemMessageParam {
   return { role: "system", content };
 }
 
 function user(
   content: string
-): OpenAI.Chat.Completions.ChatCompletionMessageParam {
+): OpenAI.Chat.Completions.ChatCompletionUserMessageParam {
   return { role: "user", content };
 }
 
 function assistant(
   content: string
-): OpenAI.Chat.Completions.ChatCompletionMessageParam {
+): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
   return { role: "assistant", content };
 }
 
 function assistantFn(
-  function_call: OpenAI.Chat.Completions.ChatCompletionMessageParam.FunctionCall
-): OpenAI.Chat.Completions.ChatCompletionMessageParam {
+  function_call: OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam.FunctionCall
+): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
   return { role: "assistant", content: null, function_call };
 }
 
