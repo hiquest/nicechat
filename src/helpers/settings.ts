@@ -7,7 +7,7 @@ const SETTINGS_FILE_NAME = ".nicechat.json";
 
 const DEFAULT_MODEL = "gpt-4";
 const DEFAULT_SYSTEM =
-  "You are a helpful assistant. You answer consise and to the point.";
+  "You are a helpful assistant. You answer concisely and to the point.";
 
 export type Settings = {
   model: string;
