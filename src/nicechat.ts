@@ -1,8 +1,10 @@
 import chalk from "chalk";
 import * as readline from "node:readline/promises";
-import OpenAI from "openai";
+import { chat as chatAnthropic } from "./anthropic";
 import { readSettings } from "./helpers/settings";
+import { chatOpenai } from "./openai";
 import { ChatPlugin } from "./plugins/ChatPlugin";
+import OpenAI from "openai";
 
 const EXIT_COMMANDS = ["exit", "quit", "q", "bye"];
 
@@ -19,15 +21,37 @@ const NiceChat = {
 
     const command = !args[0] || args[0].startsWith("--") ? "chat" : args[0];
 
-    const openai = new OpenAI({ apiKey: settings.openai_key });
-    const isDebug = args.some((x) => x === "--debug");
-
-    const functions = [...NiceChat.plugins.values()].map((x) => x.meta);
-
     if (command === "list-models") {
-      await listModels();
+      await listModels(settings.openai_key);
     } else if (command === "chat") {
-      await chat();
+      const profileName = args[1] || "default";
+      const profile = settings.profiles[profileName];
+
+      if (!profile) {
+        throw new Error(
+          `Profile ${profileName} not found. Possible values: ` +
+            Object.keys(settings.profiles).join(", ")
+        );
+      }
+
+      if (profile.vendor === "anthropic") {
+        await chatAnthropic(
+          settings.anthropic_key,
+          profile.model,
+          profile.system
+        );
+      } else if (profile.vendor === "openai") {
+        const isDebug = args.some((x) => x === "--debug");
+        await chatOpenai(
+          settings.openai_key,
+          profile.model,
+          profile.system,
+          isDebug,
+          NiceChat.plugins
+        );
+      } else {
+        throw new Error("Unknown vendor: " + profile.vendor);
+      }
     } else if (command === "run-plugin") {
       const pluginName = args[1];
       const plugin = NiceChat.plugins.get(pluginName);
@@ -52,14 +76,17 @@ const NiceChat = {
       const c = chalk.bold;
       console.log("");
       console.log(
-        `  ${c("chat [--debug]")}   start chat with the assistant (default)`
+        `  ${c(
+          "chat [profile] [--debug]"
+        )}   start chat with the assistant (default)`
       );
       console.log("");
       console.log(`  ${c("list-models")}      list available models`);
       console.log(`  ${c("help")}             show this help`);
     }
 
-    async function listModels() {
+    async function listModels(apiKey: string) {
+      const openai = new OpenAI({ apiKey });
       let models = null;
       while (models === null || models.hasNextPage()) {
         models = await openai.models.list();
@@ -68,90 +95,10 @@ const NiceChat = {
         }
       }
     }
-
-    async function chat() {
-      console.log("[" + chalk.blueBright(settings.system) + "]");
-
-      const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-        system(settings.system),
-      ];
-
-      // initial use input
-      const input = await readLine();
-      messages.push(user(input));
-
-      while (true) {
-        // starting stream
-        const stream = await openai.chat.completions.create({
-          model: settings.model,
-          messages,
-          functions,
-          stream: true,
-        });
-
-        let msg = "";
-        let fcall = {
-          name: "",
-          arguments: "",
-        };
-        for await (const part of stream) {
-          // collect regular message
-          const p = part.choices[0]?.delta?.content || "";
-          if (p) {
-            process.stdout.write(chalk.greenBright(p));
-            msg += p;
-          }
-
-          // collect functino call
-          const pfn = part.choices[0]?.delta?.function_call;
-          if (pfn) {
-            if (pfn.name) {
-              fcall.name += pfn.name;
-            }
-            if (pfn.arguments) {
-              fcall.arguments += pfn.arguments;
-            }
-          }
-        }
-
-        stream.controller.abort();
-
-        if (fcall.name) {
-          // function call
-          messages.push(assistantFn(fcall));
-
-          const plugin = NiceChat.plugins.get(fcall.name);
-          if (!plugin) {
-            throw new Error("Unregistered function: " + fcall.name);
-          }
-
-          const toolkit = {
-            log: logger(`[${plugin.meta.name}]`),
-            debug: isDebug ? logger(`[${plugin.meta.name}]`) : () => {},
-          };
-
-          console.log(
-            `[${chalk.blueBright(plugin.meta.name)}]: ${chalk.yellowBright(
-              fcall.arguments.replace(/\n/g, " ").replace(/\s+/g, " ")
-            )}`
-          );
-          const fnResult = await plugin.execute(fcall.arguments, { toolkit });
-          console.log();
-          messages.push(fnResultResp(fcall.name, fnResult));
-        } else {
-          messages.push(assistant(msg));
-
-          // ask user for next input
-          console.log("\n");
-          const input = await readLine();
-          messages.push(user(input));
-        }
-      }
-    }
   },
 };
 
-async function readLine() {
+export async function readLine() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -168,42 +115,9 @@ async function readLine() {
   return text;
 }
 
-// helpers
-
-function system(
-  content: string
-): OpenAI.Chat.Completions.ChatCompletionSystemMessageParam {
-  return { role: "system", content };
-}
-
-function user(
-  content: string
-): OpenAI.Chat.Completions.ChatCompletionUserMessageParam {
-  return { role: "user", content };
-}
-
-function assistant(
-  content: string
-): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
-  return { role: "assistant", content };
-}
-
-function assistantFn(
-  function_call: OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam.FunctionCall
-): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
-  return { role: "assistant", content: null, function_call };
-}
-
-function fnResultResp(
-  name: string,
-  content: string
-): OpenAI.Chat.Completions.ChatCompletionMessageParam {
-  return { role: "function", name, content };
-}
-
 export default NiceChat;
 
-function logger(prefix: string) {
+export function logger(prefix: string) {
   return function log(msg: string) {
     console.log(`${chalk.blueBright(prefix)} ${msg}`);
   };

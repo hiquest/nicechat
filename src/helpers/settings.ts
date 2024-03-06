@@ -9,10 +9,16 @@ const DEFAULT_MODEL = "gpt-4";
 const DEFAULT_SYSTEM =
   "You are a helpful assistant. You answer concisely and to the point.";
 
-export type Settings = {
+export type Profile = {
+  vendor: "openai" | "anthropic";
   model: string;
-  openai_key: string;
   system: string;
+};
+
+export type Settings = {
+  openai_key: string;
+  anthropic_key: string;
+  profiles: Record<string, Profile>;
 };
 
 const bb = chalk.blueBright;
@@ -42,8 +48,10 @@ export async function readSettings() {
 
     const settings: Settings = {
       openai_key,
-      model,
-      system,
+      anthropic_key: "",
+      profiles: {
+        default: { model, system, vendor: "openai" },
+      },
     };
 
     // save settings to disk
@@ -52,8 +60,13 @@ export async function readSettings() {
     console.log("Settings file saved!\n\n");
   }
 
-  const settings = JSON.parse(fs.readFileSync(absPath, "utf-8")) as Settings;
-  return settings;
+  try {
+    const settings = JSON.parse(fs.readFileSync(absPath, "utf-8")) as Settings;
+    return settings;
+  } catch (e) {
+    console.log("Error reading settings file:", e);
+    process.exit(1);
+  }
 }
 
 async function readLine(defaultValue?: string) {
