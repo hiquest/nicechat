@@ -10,7 +10,7 @@ const DEFAULT_SYSTEM =
   "You are a helpful assistant. You answer concisely and to the point.";
 
 export type Profile = {
-  vendor: "openai" | "anthropic";
+  vendor: "openai" | "anthropic" | "replicate";
   model: string;
   system: string;
 };
@@ -18,6 +18,7 @@ export type Profile = {
 export type Settings = {
   openai_key: string;
   anthropic_key: string;
+  replicate_key: string;
   profiles: Record<string, Profile>;
 };
 
@@ -49,6 +50,7 @@ export async function readSettings() {
     const settings: Settings = {
       openai_key,
       anthropic_key: "",
+      replicate_key: "",
       profiles: {
         default: { model, system, vendor: "openai" },
       },

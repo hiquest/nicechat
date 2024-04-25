@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import * as readline from "node:readline/promises";
 import { chat as chatAnthropic } from "./anthropic";
+import { chat as chatReplicate } from "./replicate";
 import { readSettings } from "./helpers/settings";
 import { chatOpenai } from "./openai";
 import { ChatPlugin } from "./plugins/ChatPlugin";
@@ -34,7 +35,13 @@ const NiceChat = {
         );
       }
 
-      if (profile.vendor === "anthropic") {
+      if (profile.vendor === "replicate") {
+        await chatReplicate(
+          settings.replicate_key,
+          profile.model,
+          profile.system
+        );
+      } else if (profile.vendor === "anthropic") {
         await chatAnthropic(
           settings.anthropic_key,
           profile.model,

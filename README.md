@@ -1,6 +1,8 @@
 # nicechat
 
-An extensible command-line chat. Supports OpenAI and Anthropic models.
+An extensible multi-provider command-line chat.
+
+Currently supports OpenAI, Anthropic and Replicate.
 
 ![Demo GIF](./media/intro.gif)
 
@@ -10,20 +12,25 @@ Create a configuration file at `~/.nicechat.json`.
 
 ```json
 {
-  "openai_key": "sk-...",
-  "anthropic_key": "sk-...",
+  "openai_key": "...",
+  "anthropic_key": "...",
+  "replicate_key": "...",
   "profiles": {
     "default": {
       "vendor": "openai",
       "model": "gpt-4-1106-preview",
-      "system": "You are a helpful assistant. You answer concisely and to the point. No bullshit."
+      "system": "You are a helpful assistant. You answer concisely and to the point."
     },
     "claude": {
       "vendor": "anthropic",
       "model": "claude-3-opus-20240229",
-      "system": "You are a helpful assistant. You answer concisely and to the point. No bullshit."
+      "system": "You are a helpful assistant. You answer concisely and to the point."
+    },
+    "llama3-8b": {
+      "vendor": "replicate",
+      "model": "meta/meta-llama-3-8b-instruct",
+      "system": "You are a pirate."
     }
-  }
 }
 ```
 
@@ -39,9 +46,7 @@ or to run the default profile:
 $ nicechat
 ```
 
-## Built-in plugins
-
-! Plugins are only available for OpenAI models!
+## Built-in plugins (OpenAI only)
 
 Nicechat comes with several useful plugins that are basically just [functions](https://platform.openai.com/docs/guides/gpt/function-calling) that run on your machine.
 

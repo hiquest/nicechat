@@ -1,6 +1,6 @@
 {
   "name": "nicechat",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "An extensible AI chat framework for OpenAi's models",
   "bin": {
     "nicechat": "dist/index.js"
@@ -34,6 +34,7 @@
     "@anthropic-ai/sdk": "^0.16.0",
     "chalk": "<5",
     "openai": "^4.5.0",
+    "replicate": "^0.29.1",
     "turndown": "^7.1.2"
   }
 }
