@@ -1,8 +1,13 @@
 # nicechat
 
-An extensible multi-provider command-line chat.
+The simplest way to chat with LLM models in your terminal.
 
-Currently supports [OpenAI](https://platform.openai.com/docs/models), [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models/overview), [DeepSeek](https://api-docs.deepseek.com/), and [Replicate](https://replicate.com/collections/language-models).
+Currently supports:
+
+- [OpenAI](https://platform.openai.com/docs/models)
+- [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models/overview)
+- [DeepSeek](https://api-docs.deepseek.com/)
+- [Replicate](https://replicate.com/collections/language-models).
 
 ![Demo GIF](./media/intro.gif)
 
