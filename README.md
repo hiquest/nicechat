@@ -30,7 +30,7 @@ export DEEPSEEK_API_KEY="your_deepseek_api_key"
 export REPLICATE_API_TOKEN="your_replicate_api_token"
 ```
 
-Create a configuration file at `~/.nicechat.json` with profiles.
+Create a configuration file named `.nicechat.json` in your home directory (e.g., `C:\Users\YourName\.nicechat.json` on Windows, or `~/.nicechat.json` on macOS/Linux). Use this file to define your profiles.
 
 ```json
 {
