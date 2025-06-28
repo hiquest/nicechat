@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import OpenAI from "openai";
-import { logger, readLine } from "./nicechat";
-import { ChatPlugin } from "./plugins/ChatPlugin";
+import { logger, readLine } from "../nicechat";
+import { ChatPlugin } from "../plugins/ChatPlugin";
 
 export async function chatOpenai(
   apiKey: string,

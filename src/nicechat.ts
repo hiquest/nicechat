@@ -1,13 +1,25 @@
 import chalk from "chalk";
 import * as readline from "node:readline/promises";
-import { chat as chatAnthropic } from "./anthropic";
-import { chat as chatReplicate } from "./replicate";
+import { chat as chatAnthropic } from "./providers/anthropic";
+import { chat as chatReplicate } from "./providers/replicate";
 import { readSettings } from "./helpers/settings";
-import { chatOpenai } from "./openai";
+import { chatOpenai } from "./providers/openai";
 import { ChatPlugin } from "./plugins/ChatPlugin";
 import OpenAI from "openai";
+import { chatDeepSeek } from "./providers/deepseek";
 
 const EXIT_COMMANDS = ["exit", "quit", "q", "bye"];
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const REPLICATE_API_KEY = process.env.REPLICATE_API_KEY;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+
+function throwMissingEnv(envVar: string) {
+  throw new Error(
+    `${envVar} environment variable is not set. Please set it to use this feature.`,
+  );
+}
 
 const NiceChat = {
   plugins: new Map<string, ChatPlugin>(),
@@ -23,7 +35,11 @@ const NiceChat = {
     const command = !args[0] || args[0].startsWith("--") ? "chat" : args[0];
 
     if (command === "list-models") {
-      await listModels(settings.openai_key);
+      if (!OPENAI_API_KEY) {
+        return throwMissingEnv("OPENAI_API_KEY");
+      }
+
+      await listModels(OPENAI_API_KEY);
     } else if (command === "chat") {
       const profileName = args[1] || "default";
       const profile = settings.profiles[profileName];
@@ -31,30 +47,36 @@ const NiceChat = {
       if (!profile) {
         throw new Error(
           `Profile ${profileName} not found. Possible values: ` +
-            Object.keys(settings.profiles).join(", ")
+            Object.keys(settings.profiles).join(", "),
         );
       }
 
       if (profile.vendor === "replicate") {
-        await chatReplicate(
-          settings.replicate_key,
-          profile.model,
-          profile.system
-        );
+        if (!REPLICATE_API_KEY) {
+          return throwMissingEnv("REPLICATE_API_KEY");
+        }
+        await chatReplicate(REPLICATE_API_KEY, profile.model, profile.system);
       } else if (profile.vendor === "anthropic") {
-        await chatAnthropic(
-          settings.anthropic_key,
-          profile.model,
-          profile.system
-        );
+        if (!ANTHROPIC_API_KEY) {
+          return throwMissingEnv("ANTHROPIC_API_KEY");
+        }
+        await chatAnthropic(ANTHROPIC_API_KEY, profile.model, profile.system);
+      } else if (profile.vendor === "deepseek") {
+        if (!DEEPSEEK_API_KEY) {
+          return throwMissingEnv("DEEPSEEK_API_KEY");
+        }
+        await chatDeepSeek(DEEPSEEK_API_KEY, profile.model, profile.system);
       } else if (profile.vendor === "openai") {
         const isDebug = args.some((x) => x === "--debug");
+        if (!OPENAI_API_KEY) {
+          return throwMissingEnv("OPENAI_API_KEY");
+        }
         await chatOpenai(
-          settings.openai_key,
+          OPENAI_API_KEY,
           profile.model,
           profile.system,
           isDebug,
-          NiceChat.plugins
+          NiceChat.plugins,
         );
       } else {
         throw new Error("Unknown vendor: " + profile.vendor);
@@ -84,8 +106,8 @@ const NiceChat = {
       console.log("");
       console.log(
         `  ${c(
-          "chat [profile] [--debug]"
-        )}   start chat with the assistant (default)`
+          "chat [profile] [--debug]",
+        )}   start chat with the assistant (default)`,
       );
       console.log("");
       console.log(`  ${c("list-models")}      list available models`);

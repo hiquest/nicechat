@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { readLine } from "./nicechat";
+import { readLine } from "../nicechat";
 
 import Replicate from "replicate";
 
