@@ -6,6 +6,12 @@ Currently supports [OpenAI](https://platform.openai.com/docs/models), [Anthropic
 
 ![Demo GIF](./media/intro.gif)
 
+## Installation
+
+```bash
+npm install -g nicechat
+```
+
 ## How to use it?
 
 Before starting, make sure you have the required environment variables set up for your API keys:
