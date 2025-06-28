@@ -2,14 +2,16 @@
 
 The simplest way to chat with LLM models in your terminal.
 
+![Demo GIF](./media/intro.gif)
+
+------
+
 Currently supports:
 
 - [OpenAI](https://platform.openai.com/docs/models)
 - [Anthropic](https://docs.anthropic.com/en/docs/about-claude/models/overview)
 - [DeepSeek](https://api-docs.deepseek.com/)
-- [Replicate](https://replicate.com/collections/language-models).
-
-![Demo GIF](./media/intro.gif)
+- [Replicate](https://replicate.com/collections/language-models)
 
 ## Installation
 
