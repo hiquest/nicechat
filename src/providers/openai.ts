@@ -3,18 +3,30 @@ import OpenAI from "openai";
 import { logger, readLine } from "../nicechat";
 import { ChatPlugin } from "../plugins/ChatPlugin";
 
+export function printStarter(vendor: string, model: string, systemMsg: string) {
+  console.log(
+    chalk.bold(vendor) +
+      "/" +
+      chalk.greenBright(model) +
+      " " +
+      "[" +
+      chalk.blueBright(systemMsg) +
+      "]",
+  );
+}
+
 export async function chatOpenai(
   apiKey: string,
   model: string,
   systemMsg: string,
   isDebug: boolean,
-  plugins: Map<string, ChatPlugin>
+  plugins: Map<string, ChatPlugin>,
 ) {
   const openai = new OpenAI({ apiKey });
 
   const functions = [...plugins.values()].map((x) => x.meta);
 
-  console.log("[" + chalk.blueBright(systemMsg) + "]");
+  printStarter("openai", model, systemMsg);
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     system(systemMsg),
@@ -76,8 +88,8 @@ export async function chatOpenai(
 
       console.log(
         `[${chalk.blueBright(plugin.meta.name)}]: ${chalk.yellowBright(
-          fcall.arguments.replace(/\n/g, " ").replace(/\s+/g, " ")
-        )}`
+          fcall.arguments.replace(/\n/g, " ").replace(/\s+/g, " "),
+        )}`,
       );
       const fnResult = await plugin.execute(fcall.arguments, { toolkit });
       console.log();
@@ -96,32 +108,32 @@ export async function chatOpenai(
 // helpers
 
 function system(
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionSystemMessageParam {
   return { role: "system", content };
 }
 
 function user(
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionUserMessageParam {
   return { role: "user", content };
 }
 
 function assistant(
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
   return { role: "assistant", content };
 }
 
 function assistantFn(
-  function_call: OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam.FunctionCall
+  function_call: OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam.FunctionCall,
 ): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
   return { role: "assistant", content: null, function_call };
 }
 
 function fnResultResp(
   name: string,
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
   return { role: "function", name, content };
 }

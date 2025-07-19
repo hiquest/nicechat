@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { readLine } from "../nicechat";
 
 import Replicate from "replicate";
+import { printStarter } from "./openai";
 
 const MAX_TOKENS = 1024;
 
@@ -11,13 +12,11 @@ type Message = {
 };
 
 export async function chat(apiKey: string, model: string, system: string) {
-  console.log("apiKey", apiKey);
-
   const client = new Replicate({
     auth: apiKey,
   });
 
-  console.log("[" + chalk.blueBright(system) + "]");
+  printStarter("replicated", model, system);
 
   const messages: Message[] = [];
 

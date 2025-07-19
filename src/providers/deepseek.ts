@@ -1,18 +1,18 @@
 import chalk from "chalk";
 import OpenAI from "openai";
 import { readLine } from "../nicechat";
+import { printStarter } from "./openai";
 
 const BASE_URL = "https://api.deepseek.com";
 
 export async function chatDeepSeek(
   apiKey: string,
   model: string,
-  systemMsg: string
+  systemMsg: string,
 ) {
-  console.log("HELLO?", apiKey, model);
   const openai = new OpenAI({ apiKey, baseURL: BASE_URL });
 
-  console.log("[" + chalk.blueBright(systemMsg) + "]");
+  printStarter("deepseek", model, systemMsg);
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     system(systemMsg),
@@ -55,19 +55,19 @@ export async function chatDeepSeek(
 // helpers
 
 function system(
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionSystemMessageParam {
   return { role: "system", content };
 }
 
 function user(
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionUserMessageParam {
   return { role: "user", content };
 }
 
 function assistant(
-  content: string
+  content: string,
 ): OpenAI.Chat.Completions.ChatCompletionAssistantMessageParam {
   return { role: "assistant", content };
 }

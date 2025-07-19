@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import chalk from "chalk";
 import { readLine } from "../nicechat";
 import { MessageParam } from "@anthropic-ai/sdk/resources/messages.mjs";
+import { printStarter } from "./openai";
 
 const MAX_TOKENS = 1024;
 
@@ -10,7 +11,7 @@ export async function chat(apiKey: string, model: string, system: string) {
     apiKey,
   });
 
-  console.log("[" + chalk.blueBright(system) + "]");
+  printStarter("anthropic", model, system);
 
   const messages: MessageParam[] = [];
 
@@ -47,7 +48,7 @@ async function exchange(
   client: Anthropic,
   model: string,
   system: string,
-  messages: MessageParam[]
+  messages: MessageParam[],
 ): Promise<string> {
   return new Promise((resolve) => {
     let msg = "";
