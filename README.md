@@ -45,6 +45,12 @@ Create a configuration file named `.nicechat.json` in your home directory (e.g.,
       "model": "claude-3-opus-20240229",
       "system": "You are a helpful assistant. You answer concisely and to the point."
     },
+    // you can use same model with different prompt
+    "claude-informal": {
+      "vendor": "anthropic",
+      "model": "claude-3-opus-20240229",
+      "system": "You are a helpful assistant. You answer in an informal and playful tone. You vocabulary is simple and easy to understand."
+    },
     "r1": {
       "vendor": "deepseek",
       "model": "deepseek-reasoner",
