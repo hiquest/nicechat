@@ -1,12 +1,11 @@
 import chalk from "chalk";
 import * as readline from "node:readline/promises";
-import { chat as chatAnthropic } from "./providers/anthropic";
-import { chat as chatReplicate } from "./providers/replicate";
-import { readSettings } from "./helpers/settings";
-import { chatOpenai } from "./providers/openai";
-import { ChatPlugin } from "./plugins/ChatPlugin";
 import OpenAI from "openai";
+import { readSettings } from "./helpers/settings";
+import { chat as chatAnthropic } from "./providers/anthropic";
 import { chatDeepSeek } from "./providers/deepseek";
+import { chatOpenai } from "./providers/openai";
+import { chat as chatReplicate } from "./providers/replicate";
 
 const EXIT_COMMANDS = ["exit", "quit", "q", "bye"];
 
@@ -14,6 +13,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const REPLICATE_API_KEY = process.env.REPLICATE_API_KEY;
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
 function throwMissingEnv(envVar: string) {
   throw new Error(
@@ -22,12 +22,6 @@ function throwMissingEnv(envVar: string) {
 }
 
 const NiceChat = {
-  plugins: new Map<string, ChatPlugin>(),
-
-  registerPlugin(p: ChatPlugin) {
-    NiceChat.plugins.set(p.meta.name, p);
-  },
-
   async run() {
     const settings = await readSettings();
     const args = process.argv.slice(2);
@@ -67,32 +61,23 @@ const NiceChat = {
         }
         await chatDeepSeek(DEEPSEEK_API_KEY, profile.model, profile.system);
       } else if (profile.vendor === "openai") {
-        const isDebug = args.some((x) => x === "--debug");
         if (!OPENAI_API_KEY) {
           return throwMissingEnv("OPENAI_API_KEY");
         }
+        await chatOpenai(OPENAI_API_KEY, profile.model, profile.system);
+      } else if (profile.vendor === "openrouter") {
+        if (!OPENROUTER_API_KEY) {
+          return throwMissingEnv("OPENROUTER_API_KEY");
+        }
         await chatOpenai(
-          OPENAI_API_KEY,
+          OPENROUTER_API_KEY,
           profile.model,
           profile.system,
-          isDebug,
-          NiceChat.plugins,
+          "https://openrouter.ai/api/v1",
         );
       } else {
         throw new Error("Unknown vendor: " + profile.vendor);
       }
-    } else if (command === "run-plugin") {
-      const pluginName = args[1];
-      const plugin = NiceChat.plugins.get(pluginName);
-      if (!plugin) {
-        throw new Error("Unregistered plugin: " + pluginName);
-      }
-      const toolkit = {
-        log: logger(`[${plugin.meta.name}]`),
-        debug: logger(`[${plugin.meta.name}]`),
-      };
-      const result = await plugin.execute(args[2], { toolkit });
-      console.log(result);
     } else if (command === "help") {
       printHelp();
     } else {
@@ -105,9 +90,7 @@ const NiceChat = {
       const c = chalk.bold;
       console.log("");
       console.log(
-        `  ${c(
-          "chat [profile] [--debug]",
-        )}   start chat with the assistant (default)`,
+        `  ${c("chat [profile]")}   start chat with the assistant (default)`,
       );
       console.log("");
       console.log(`  ${c("list-models")}      list available models`);

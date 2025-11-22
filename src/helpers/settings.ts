@@ -9,7 +9,7 @@ const SETTINGS_FILE_NAME = ".nicechat.json";
 //   "You are a helpful assistant. You answer concisely and to the point.";
 
 export type Profile = {
-  vendor: "openai" | "anthropic" | "replicate" | "deepseek";
+  vendor: "openai" | "anthropic" | "replicate" | "deepseek" | "openrouter";
   model: string;
   system: string;
 };
