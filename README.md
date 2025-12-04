@@ -78,12 +78,18 @@ Create a configuration file named `.nicechat.json` in your home directory (e.g.,
 
 ## Start the chat:
 
-```
-$ nicechat chat claude
-```
+```bash
+# Start chat with a specific profile
+$ nicechat claude
 
-Omit the arguments to run the default profile:
-
-```
+# Or use the default profile
 $ nicechat
 ```
+
+## List available profiles:
+
+```bash
+$ nicechat list
+```
+
+This will display all configured profiles with their vendor and model information.

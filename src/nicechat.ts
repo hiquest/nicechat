@@ -26,16 +26,19 @@ const NiceChat = {
     const settings = await readSettings();
     const args = process.argv.slice(2);
 
-    const command = !args[0] || args[0].startsWith("--") ? "chat" : args[0];
+    const KNOWN_COMMANDS = ["list", "list-models", "help"];
+    const command = KNOWN_COMMANDS.includes(args[0]) ? args[0] : "chat";
 
-    if (command === "list-models") {
+    if (command === "list") {
+      await listProfiles(settings);
+    } else if (command === "list-models") {
       if (!OPENAI_API_KEY) {
         return throwMissingEnv("OPENAI_API_KEY");
       }
 
       await listModels(OPENAI_API_KEY);
     } else if (command === "chat") {
-      const profileName = args[1] || "default";
+      const profileName = args[0] || "default";
       const profile = settings.profiles[profileName];
 
       if (!profile) {
@@ -90,11 +93,34 @@ const NiceChat = {
       const c = chalk.bold;
       console.log("");
       console.log(
-        `  ${c("chat [profile]")}   start chat with the assistant (default)`,
+        `  ${c("[profile]")}        start chat with the assistant (default)`,
       );
       console.log("");
+      console.log(`  ${c("list")}             list available profiles`);
       console.log(`  ${c("list-models")}      list available models`);
       console.log(`  ${c("help")}             show this help`);
+    }
+
+    async function listProfiles(
+      settings: Awaited<ReturnType<typeof readSettings>>,
+    ) {
+      console.log(chalk.bold("Available profiles:"));
+      console.log("");
+
+      const profileNames = Object.keys(settings.profiles);
+
+      if (profileNames.length === 0) {
+        console.log(chalk.gray("  No profiles configured"));
+        return;
+      }
+
+      for (const name of profileNames) {
+        const profile = settings.profiles[name];
+        console.log(
+          `  ${chalk.cyan(name.padEnd(15))} ${chalk.gray(profile.vendor.padEnd(12))} ${profile.model}`,
+        );
+      }
+      console.log("");
     }
 
     async function listModels(apiKey: string) {
