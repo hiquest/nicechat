@@ -1,6 +1,6 @@
 {
   "name": "nicechat",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A minimalistic CLI AI chat.",
   "bin": {
     "nicechat": "dist/index.js"

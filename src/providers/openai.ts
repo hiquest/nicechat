@@ -1,18 +1,7 @@
 import chalk from "chalk";
 import OpenAI, { ClientOptions } from "openai";
+import { printStarter } from "../helpers/print";
 import { readLine } from "../nicechat";
-
-export function printStarter(vendor: string, model: string, systemMsg: string) {
-  console.log(
-    chalk.bold(vendor) +
-      "/" +
-      chalk.greenBright(model) +
-      " " +
-      "[" +
-      chalk.blueBright(systemMsg) +
-      "]",
-  );
-}
 
 export async function chatOpenai(
   apiKey: string,

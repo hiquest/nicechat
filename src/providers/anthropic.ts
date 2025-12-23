@@ -1,8 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
-import chalk from "chalk";
-import { readLine } from "../nicechat";
 import { MessageParam } from "@anthropic-ai/sdk/resources/messages.mjs";
-import { printStarter } from "./openai";
+import chalk from "chalk";
+import { printStarter } from "../helpers/print";
+import { readLine } from "../nicechat";
 
 const MAX_TOKENS = 1024;
 

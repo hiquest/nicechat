@@ -1,8 +1,7 @@
 import chalk from "chalk";
-import { readLine } from "../nicechat";
-
 import Replicate from "replicate";
-import { printStarter } from "./openai";
+import { printStarter } from "../helpers/print";
+import { readLine } from "../nicechat";
 
 const MAX_TOKENS = 1024;
 

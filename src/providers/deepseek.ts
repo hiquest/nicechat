@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import OpenAI from "openai";
+import { printStarter } from "../helpers/print";
 import { readLine } from "../nicechat";
-import { printStarter } from "./openai";
 
 const BASE_URL = "https://api.deepseek.com";
 
