@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { printStarter } from "../helpers/print";
 import { readLine } from "../nicechat";
 
-const MAX_TOKENS = 1024;
+const MAX_TOKENS = 8096;
 
 export async function chat(apiKey: string, model: string, system: string) {
   const client = new Anthropic({
@@ -50,7 +50,7 @@ async function exchange(
   system: string,
   messages: MessageParam[],
 ): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let msg = "";
 
     client.messages
@@ -69,6 +69,9 @@ async function exchange(
       })
       .on("end", () => {
         resolve(msg);
+      })
+      .on("error", (err) => {
+        reject(err);
       });
   });
 }
