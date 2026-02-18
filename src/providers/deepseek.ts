@@ -36,7 +36,7 @@ export async function chatDeepSeek(
       // collect regular message
       const p = part.choices[0]?.delta?.content || "";
       if (p) {
-        process.stdout.write(chalk.greenBright(p));
+        process.stdout.write(chalk.white(p));
         msg += p;
       }
     }

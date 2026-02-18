@@ -30,7 +30,7 @@ export async function chat(apiKey: string, model: string, system: string) {
 
     for await (const event of client.stream(model as any, { input: i })) {
       const m = event.toString();
-      process.stdout.write(chalk.greenBright(m));
+      process.stdout.write(chalk.white(m));
       reply += m;
     }
 

@@ -114,14 +114,14 @@ const NiceChat = {
       const profileNames = Object.keys(settings.profiles);
 
       if (profileNames.length === 0) {
-        console.log(chalk.gray("  No profiles configured"));
+        console.log(chalk.dim("  No profiles configured"));
         return;
       }
 
       for (const name of profileNames) {
         const profile = settings.profiles[name];
         console.log(
-          `  ${chalk.cyan(name.padEnd(15))} ${chalk.gray(profile.vendor.padEnd(12))} ${profile.model}`,
+          `  ${chalk.magentaBright(name.padEnd(15))} ${chalk.dim(profile.vendor.padEnd(12))} ${chalk.white(profile.model)}`,
         );
       }
       console.log("");
@@ -147,7 +147,7 @@ export async function readLine() {
     history: inputHistory,
   });
 
-  const textUntrimmed = await rl.question(chalk.yellow("> "));
+  const textUntrimmed = await rl.question(chalk.magenta("> "));
   rl.close();
 
   const text = textUntrimmed.trim();
@@ -172,6 +172,6 @@ export default NiceChat;
 
 export function logger(prefix: string) {
   return function log(msg: string) {
-    console.log(`${chalk.blueBright(prefix)} ${msg}`);
+    console.log(`${chalk.dim(prefix)} ${msg}`);
   };
 }

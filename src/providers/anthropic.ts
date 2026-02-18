@@ -63,7 +63,7 @@ async function exchange(
       .on("text", (p) => {
         // collect regular message
         if (p) {
-          process.stdout.write(chalk.greenBright(p));
+          process.stdout.write(chalk.white(p));
           msg += p;
         }
       })
