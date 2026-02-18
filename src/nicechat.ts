@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import * as readline from "node:readline/promises";
 import OpenAI from "openai";
+import { appendHistory, loadHistory, writeHistory } from "./helpers/history";
 import { readSettings } from "./helpers/settings";
 import { chat as chatAnthropic } from "./providers/anthropic";
 import { chatDeepSeek } from "./providers/deepseek";
@@ -8,6 +9,9 @@ import { chatOpenai } from "./providers/openai";
 import { chat as chatReplicate } from "./providers/replicate";
 
 const EXIT_COMMANDS = ["exit", "quit", "q", "bye"];
+const MAX_HISTORY = 500;
+
+const inputHistory: string[] = loadHistory();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const REPLICATE_API_KEY = process.env.REPLICATE_API_KEY;
@@ -140,6 +144,7 @@ export async function readLine() {
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
+    history: inputHistory,
   });
 
   const textUntrimmed = await rl.question(chalk.yellow("> "));
@@ -150,6 +155,16 @@ export async function readLine() {
   if (EXIT_COMMANDS.includes(text)) {
     process.exit(0);
   }
+
+  if (text) {
+    inputHistory.push(text);
+    appendHistory(text);
+    if (inputHistory.length > MAX_HISTORY) {
+      inputHistory.splice(0, inputHistory.length - MAX_HISTORY);
+      writeHistory(inputHistory);
+    }
+  }
+
   return text;
 }
 
