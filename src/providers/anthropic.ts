@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { MessageParam } from "@anthropic-ai/sdk/resources/messages.mjs";
-import chalk from "chalk";
+import { colors } from "../helpers/colors";
 import { printStarter } from "../helpers/print";
 import { readLine } from "../nicechat";
 
@@ -63,7 +63,7 @@ async function exchange(
       .on("text", (p) => {
         // collect regular message
         if (p) {
-          process.stdout.write(chalk.white(p));
+          process.stdout.write(colors.reply(p));
           msg += p;
         }
       })

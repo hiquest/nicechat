@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import * as readline from "node:readline/promises";
+import { colors } from "./helpers/colors";
 import OpenAI from "openai";
 import { appendHistory, loadHistory, writeHistory } from "./helpers/history";
 import { readSettings } from "./helpers/settings";
@@ -94,7 +94,7 @@ const NiceChat = {
 
     function printHelp() {
       console.log("Available commands:");
-      const c = chalk.bold;
+      const c = colors.bold;
       console.log("");
       console.log(
         `  ${c("[profile]")}        start chat with the assistant (default)`,
@@ -108,20 +108,20 @@ const NiceChat = {
     async function listProfiles(
       settings: Awaited<ReturnType<typeof readSettings>>,
     ) {
-      console.log(chalk.bold("Available profiles:"));
+      console.log(colors.bold("Available profiles:"));
       console.log("");
 
       const profileNames = Object.keys(settings.profiles);
 
       if (profileNames.length === 0) {
-        console.log(chalk.dim("  No profiles configured"));
+        console.log(colors.dim("  No profiles configured"));
         return;
       }
 
       for (const name of profileNames) {
         const profile = settings.profiles[name];
         console.log(
-          `  ${chalk.magentaBright(name.padEnd(15))} ${chalk.dim(profile.vendor.padEnd(12))} ${chalk.white(profile.model)}`,
+          `  ${colors.model(name.padEnd(15))} ${colors.dim(profile.vendor.padEnd(12))} ${colors.profileModel(profile.model)}`,
         );
       }
       console.log("");
@@ -147,8 +147,9 @@ export async function readLine() {
     history: inputHistory,
   });
 
-  const textUntrimmed = await rl.question(chalk.magenta("> "));
+  const textUntrimmed = await rl.question(colors.prompt("> ") + "\x1b[95m");
   rl.close();
+  process.stdout.write("\x1b[0m");
 
   const text = textUntrimmed.trim();
 
@@ -156,7 +157,7 @@ export async function readLine() {
     process.exit(0);
   }
 
-  if (text) {
+  if (text && text !== inputHistory[inputHistory.length - 1]) {
     inputHistory.push(text);
     appendHistory(text);
     if (inputHistory.length > MAX_HISTORY) {
@@ -172,6 +173,6 @@ export default NiceChat;
 
 export function logger(prefix: string) {
   return function log(msg: string) {
-    console.log(`${chalk.dim(prefix)} ${msg}`);
+    console.log(`${colors.dim(prefix)} ${msg}`);
   };
 }

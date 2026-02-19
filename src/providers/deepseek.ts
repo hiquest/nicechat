@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import OpenAI from "openai";
+import { colors } from "../helpers/colors";
 import { printStarter } from "../helpers/print";
 import { readLine } from "../nicechat";
 
@@ -36,7 +36,7 @@ export async function chatDeepSeek(
       // collect regular message
       const p = part.choices[0]?.delta?.content || "";
       if (p) {
-        process.stdout.write(chalk.white(p));
+        process.stdout.write(colors.reply(p));
         msg += p;
       }
     }

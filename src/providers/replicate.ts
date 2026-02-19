@@ -1,5 +1,5 @@
-import chalk from "chalk";
 import Replicate from "replicate";
+import { colors } from "../helpers/colors";
 import { printStarter } from "../helpers/print";
 import { readLine } from "../nicechat";
 
@@ -30,7 +30,7 @@ export async function chat(apiKey: string, model: string, system: string) {
 
     for await (const event of client.stream(model as any, { input: i })) {
       const m = event.toString();
-      process.stdout.write(chalk.white(m));
+      process.stdout.write(colors.reply(m));
       reply += m;
     }
 

@@ -1,11 +1,11 @@
-import chalk from "chalk";
+import { colors } from "./colors";
 
 export function printStarter(vendor: string, model: string, systemMsg: string) {
   console.log(
-    chalk.dim(vendor) +
-      chalk.dim("/") +
-      chalk.magentaBright(model) +
+    colors.dim(vendor) +
+      colors.dim("/") +
+      colors.model(model) +
       " " +
-      chalk.dim("[" + systemMsg + "]"),
+      colors.dim("[" + systemMsg + "]"),
   );
 }
