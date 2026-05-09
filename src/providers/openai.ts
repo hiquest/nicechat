@@ -16,7 +16,7 @@ export async function chatOpenai(
 
   const openai = new OpenAI(props);
 
-  printStarter("openai", model, systemMsg);
+  printStarter(baseURL ? "openrouter" : "openai", model, systemMsg);
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     system(systemMsg),
