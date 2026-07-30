@@ -1,6 +1,7 @@
 import OpenAI, { ClientOptions } from "openai";
 import { colors } from "../helpers/colors";
 import { printStarter } from "../helpers/print";
+import { ReasoningEffort } from "../helpers/settings";
 import { readLine } from "../nicechat";
 
 export async function chatOpenai(
@@ -8,6 +9,7 @@ export async function chatOpenai(
   model: string,
   systemMsg: string,
   baseURL?: "https://openrouter.ai/api/v1",
+  reasoning?: ReasoningEffort,
 ) {
   const props: ClientOptions = { apiKey };
   if (baseURL) {
@@ -16,7 +18,14 @@ export async function chatOpenai(
 
   const openai = new OpenAI(props);
 
-  printStarter(baseURL ? "openrouter" : "openai", model, systemMsg);
+  printStarter(baseURL ? "openrouter" : "openai", model, systemMsg, reasoning);
+
+  // openrouter takes `reasoning: { effort }`, openai takes `reasoning_effort`
+  const reasoningParams = !reasoning
+    ? {}
+    : baseURL
+      ? { reasoning: { effort: reasoning } }
+      : { reasoning_effort: reasoning };
 
   const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     system(systemMsg),
@@ -32,12 +41,23 @@ export async function chatOpenai(
       model,
       messages,
       stream: true,
+      ...reasoningParams,
     });
 
     let msg = "";
     for await (const part of stream) {
+      const delta = part.choices[0]?.delta as
+        | (typeof part.choices)[0]["delta"] & { reasoning?: string }
+        | undefined;
+
+      // reasoning summary, when the model streams one
+      const r = delta?.reasoning || "";
+      if (r) {
+        process.stdout.write(colors.dim(r));
+      }
+
       // collect regular message
-      const p = part.choices[0]?.delta?.content || "";
+      const p = delta?.content || "";
       if (p) {
         process.stdout.write(colors.reply(p));
         msg += p;

@@ -71,7 +71,13 @@ const NiceChat = {
         if (!OPENAI_API_KEY) {
           return throwMissingEnv("OPENAI_API_KEY");
         }
-        await chatOpenai(OPENAI_API_KEY, profile.model, profile.system);
+        await chatOpenai(
+          OPENAI_API_KEY,
+          profile.model,
+          profile.system,
+          undefined,
+          profile.reasoning,
+        );
       } else if (profile.vendor === "openrouter") {
         if (!OPENROUTER_API_KEY) {
           return throwMissingEnv("OPENROUTER_API_KEY");
@@ -81,6 +87,7 @@ const NiceChat = {
           profile.model,
           profile.system,
           "https://openrouter.ai/api/v1",
+          profile.reasoning,
         );
       } else {
         throw new Error("Unknown vendor: " + profile.vendor);

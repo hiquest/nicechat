@@ -8,10 +8,20 @@ const SETTINGS_FILE_NAME = ".nicechat.json";
 // const DEFAULT_SYSTEM =
 //   "You are a helpful assistant. You answer concisely and to the point.";
 
+// mirrors OpenAI's shared ReasoningEffort; actual support is model-dependent
+export type ReasoningEffort =
+  | "none"
+  | "minimal"
+  | "low"
+  | "medium"
+  | "high"
+  | "xhigh";
+
 export type Profile = {
   vendor: "openai" | "anthropic" | "replicate" | "deepseek" | "openrouter";
   model: string;
   system: string;
+  reasoning?: ReasoningEffort;
 };
 
 export type Settings = {

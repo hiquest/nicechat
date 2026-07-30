@@ -72,9 +72,22 @@ Create a configuration file named `.nicechat.json` in your home directory (e.g.,
       "vendor": "replicate",
       "model": "meta/meta-llama-3-8b-instruct",
       "system": "You are a pirate."
+    },
+    // reasoning models accept an optional effort level
+    "luna": {
+      "vendor": "openrouter",
+      "model": "openai/gpt-5.6-luna",
+      "system": "You are a helpful assistant. You answer concisely and to the point.",
+      "reasoning": "high"
     }
 }
 ```
+
+The optional `reasoning` field applies to the `openai` and `openrouter` vendors:
+`"none"`, `"minimal"`, `"low"`, `"medium"`, `"high"` or `"xhigh"`. Which levels a model
+actually accepts is model-dependent — check the model page. It is sent as
+`reasoning_effort` to OpenAI and as `reasoning: { effort }` to OpenRouter; non-reasoning
+models ignore it.
 
 ## Start the chat:
 
