@@ -61,7 +61,12 @@ const NiceChat = {
         if (!ANTHROPIC_API_KEY) {
           return throwMissingEnv("ANTHROPIC_API_KEY");
         }
-        await chatAnthropic(ANTHROPIC_API_KEY, profile.model, profile.system);
+        await chatAnthropic(
+          ANTHROPIC_API_KEY,
+          profile.model,
+          profile.system,
+          profile.reasoning,
+        );
       } else if (profile.vendor === "deepseek") {
         if (!DEEPSEEK_API_KEY) {
           return throwMissingEnv("DEEPSEEK_API_KEY");

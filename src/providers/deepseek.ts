@@ -31,11 +31,26 @@ export async function chatDeepSeek(
     });
 
     let msg = "";
+    let reasoned = false;
 
     for await (const part of stream) {
+      const delta = part.choices[0]?.delta as
+        | (typeof part.choices)[0]["delta"] & { reasoning_content?: string }
+        | undefined;
+
+      // chain of thought, when the model streams one
+      const r = delta?.reasoning_content || "";
+      if (r) {
+        process.stdout.write(colors.dim(r));
+        reasoned = true;
+      }
+
       // collect regular message
-      const p = part.choices[0]?.delta?.content || "";
+      const p = delta?.content || "";
       if (p) {
+        if (reasoned && !msg) {
+          process.stdout.write("\n\n");
+        }
         process.stdout.write(colors.reply(p));
         msg += p;
       }

@@ -83,11 +83,18 @@ Create a configuration file named `.nicechat.json` in your home directory (e.g.,
 }
 ```
 
-The optional `reasoning` field applies to the `openai` and `openrouter` vendors:
-`"none"`, `"minimal"`, `"low"`, `"medium"`, `"high"` or `"xhigh"`. Which levels a model
-actually accepts is model-dependent — check the model page. It is sent as
-`reasoning_effort` to OpenAI and as `reasoning: { effort }` to OpenRouter; non-reasoning
-models ignore it.
+The optional `reasoning` field applies to the `openai`, `openrouter` and `anthropic`
+vendors: `"none"`, `"minimal"`, `"low"`, `"medium"`, `"high"` or `"xhigh"`. Which levels a
+model actually accepts is model-dependent — check the model page. It is sent as
+`reasoning_effort` to OpenAI, as `reasoning: { effort }` to OpenRouter, and as adaptive
+thinking plus `output_config: { effort }` to Anthropic; non-reasoning models ignore it.
+
+Set it on an Anthropic profile only for Claude 4.6 and newer — older models reject
+adaptive thinking.
+
+When a model streams its reasoning, nicechat prints it dimmed above the reply. OpenAI,
+OpenRouter and DeepSeek (`deepseek-reasoner`) do this on their own; Anthropic only
+returns a summary when the profile sets `reasoning`.
 
 ## Start the chat:
 

@@ -45,6 +45,7 @@ export async function chatOpenai(
     });
 
     let msg = "";
+    let reasoned = false;
     for await (const part of stream) {
       const delta = part.choices[0]?.delta as
         | (typeof part.choices)[0]["delta"] & { reasoning?: string }
@@ -54,11 +55,15 @@ export async function chatOpenai(
       const r = delta?.reasoning || "";
       if (r) {
         process.stdout.write(colors.dim(r));
+        reasoned = true;
       }
 
       // collect regular message
       const p = delta?.content || "";
       if (p) {
+        if (reasoned && !msg) {
+          process.stdout.write("\n\n");
+        }
         process.stdout.write(colors.reply(p));
         msg += p;
       }
